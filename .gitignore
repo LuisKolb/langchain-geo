@@ -164,3 +164,7 @@ cython_debug/
 
 # chromaDB vector store
 .chroma/
+
+# don't keep local rdf files used only for testing
+src/data/rdf/*.*
+!src/data/rdf/.gitkeep
