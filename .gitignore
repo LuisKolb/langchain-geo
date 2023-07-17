@@ -170,4 +170,4 @@ src/data/rdf/*.*
 !src/data/rdf/.gitkeep
 
 src/chroma/**/*.*
-!src/chroma/openai-emb/index/.gitkeep
+!src/chroma/openai/index/.gitkeep
