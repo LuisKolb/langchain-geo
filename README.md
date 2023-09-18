@@ -12,3 +12,5 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 ```
+
+additionally, these components are required: `https://github.com/chroma-core/chroma/issues/189#issuecomment-1454418844`
