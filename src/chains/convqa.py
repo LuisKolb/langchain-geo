@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 import chromadb
-from langchain import OpenAI
 from langchain.vectorstores import Chroma
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.agents.openai_functions_agent.agent_token_buffer_memory import AgentTokenBufferMemory
@@ -53,7 +52,7 @@ prompt = OpenAIFunctionsAgent.create_prompt(
     )
 
 
-retriever = lc_client.as_retriever(search_kwargs={"k": 4})
+retriever = lc_client.as_retriever(search_kwargs={"k": 2})
 tool = create_retriever_tool(
     retriever, 
     "search_geologic_data",

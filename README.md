@@ -17,15 +17,10 @@ additionally, these components are required: [link to GitHub issue](https://gith
 
 ## deployment
 
-ensure the Chroma Docker container is up and running, or langcorn connection will fail
+ensure the Chroma Docker container is up and running, or langserve connection will fail
 
-then, to run langcorn locally
+then, to run langserve locally just execute the `src/server.py` file 
 
-```bash
-cd src
-uvicorn server:app --host 127.0.0.1 --port 8718
-```
+langcorn documentation: [github.com/langchain-ai/langserve](https://github.com/langchain-ai/langserve) 
 
-langcorn documentation: [github.com/msoedov/langcorn](https://github.com/msoedov/langcorn) 
-
-the frontend component using the langcorn endpoints lives in this repository: [github.com/LuisKolb/langchain-geo-frontend](https://github.com/LuisKolb/langchain-geo-frontend) 
+the frontend component using the langserve endpoints lives in this repository: [github.com/LuisKolb/langchain-geo-frontend](https://github.com/LuisKolb/langchain-geo-frontend) 
