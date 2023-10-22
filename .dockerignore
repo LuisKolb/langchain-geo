@@ -1,2 +1,3 @@
 .vscode
+src/data/rdf/*.rdf
 venv

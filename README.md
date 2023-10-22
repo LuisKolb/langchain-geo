@@ -42,6 +42,23 @@ you can also modify the port the container will be exposed on.
 
 ### the whole package as a docker thingy
 
+1. download docker-compose.yaml
+2. ensure the file `src/.env` exists and has a valid OpenAI API key as specified in `src/.env-example`
+3. run this command: 
+
+```bash
+docker-compose up
+```
+
+on windows, docker volumes (like the ones created using docker-compose) are usually found at 
+```
+\\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\<volume name>\_data
+```
+
+### obtaining the image
+
+there are two options:
+
 #### pull from dockerhub
 
 ```bash
@@ -50,12 +67,8 @@ docker pull luiskolb/geo-agent:latest
 
 #### build this image
 
-you can pull from dockerhub (coming soon...), or build your own images (will have to modify `docker-compose.yaml`):
+you can pull from dockerhub, or build your own image (will have to modify `docker-compose.yaml`):
 
 ```bash
 docker build . -t luiskolb/geo-agent:latest
 ```
-
-and then run the `docker-compose up` command
-
-on windows, docker volumes (like the ones created using docker-compose) are usually found at `\\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\<volume name>\_data`
