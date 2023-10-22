@@ -162,12 +162,6 @@ cython_debug/
 # jupyter experiment notebooks
 # *.ipynb
 
-# chromaDB vector store
-.chroma/
-
 # don't keep local rdf files used only for testing
 src/data/rdf/*.*
 !src/data/rdf/.gitkeep
-
-src/chroma/**/*.*
-!src/chroma/openai/index/.gitkeep
