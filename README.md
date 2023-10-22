@@ -39,3 +39,11 @@ you can also modify the port the container will be exposed on.
 ⚠️ be careful to use the same port number you specify here in the python chromaDB client, or the connection will fail (obviously).
 
 ⚠️ the collection_name string identifies the collection, and is saved to the `chroma.sqlite3` file. to access the collection later (after transferring the file to another machine) you need the same string.
+
+### the whole package as a docker thingy
+
+```bash
+docker run --network lc-geo-net --name chromadb chromadb/chroma:latest
+docker build . -t lc-geo-api
+docker run --network lc-geo-net --name agent -p 8001 lc-geo-api
+```

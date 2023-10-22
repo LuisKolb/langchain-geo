@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 try:
     from chains.convqa import chain
 except ConnectionError:
-    logger.error('[ERROR] Docker container is not running or not reachable! exiting...')
+    logger.error('[ERROR] ChromaDB Docker container is not running or not reachable! exiting...')
     sys.exit(1)
 
 app = FastAPI(title="Chain API Endpoints")
@@ -34,4 +34,4 @@ add_routes(app, chain)
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="localhost", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

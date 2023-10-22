@@ -13,7 +13,10 @@ from langchain.agents import AgentExecutor
 # CONFIG
 #
 
-collection_name = "geo_test"
+collection_name = "geo_test"    # collection name in chromaDB
+hostname = "chromadb"           # this is the hostname configured in docker-compose.yaml
+port = "8000"                   # this is the port configured in docker-compose.yaml
+temperature = 0                 # openAI LLM temp
 
 #
 # SETUP
@@ -21,22 +24,19 @@ collection_name = "geo_test"
 
 load_dotenv()
 
-
-embedding = OpenAIEmbeddings()
-chroma_client = chromadb.HttpClient(host="localhost", port="8000")
+chroma_client = chromadb.HttpClient(host=hostname, port=port)
 lc_client = Chroma(client=chroma_client,
                    collection_name=collection_name,
-                   embedding_function=embedding)
+                   embedding_function=OpenAIEmbeddings())
 
 
 from langchain.chat_models import ChatOpenAI
-llm = ChatOpenAI(temperature = 0)
+llm = ChatOpenAI(temperature=temperature)
 
 
 # This is needed for both the memory and the prompt
-memory_key = "luis"
+memory_key = "history"
 memory = AgentTokenBufferMemory(memory_key=memory_key, llm=llm)
-
 
 
 system_message = SystemMessage(
@@ -44,12 +44,11 @@ system_message = SystemMessage(
             "Do your best to answer the questions. "
             "You must use the tools available to look up relevant information, if neccessary. "
             "If you use the tools, make sure to always return the URL in addition to the response."
-        )
-)
+        ))
+
 prompt = OpenAIFunctionsAgent.create_prompt(
         system_message=system_message,
-        extra_prompt_messages=[MessagesPlaceholder(variable_name=memory_key)]
-    )
+        extra_prompt_messages=[MessagesPlaceholder(variable_name=memory_key)])
 
 
 retriever = lc_client.as_retriever(search_kwargs={"k": 2})
@@ -66,7 +65,7 @@ agent = OpenAIFunctionsAgent(llm=llm,
                              prompt=prompt)
 
 
-# TODO: fix the below behaviour 
+# TODO: fix the below behaviour - is this still relevant with langserve?
 # return_intermediate_steps is True because langcorn uses `chain.output_keys > 1` to identify the return data model...
 chain = AgentExecutor(agent=agent,
                       tools=tools, 

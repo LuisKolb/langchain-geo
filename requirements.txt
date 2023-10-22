@@ -10,3 +10,4 @@ sse-starlette==1.6.5
 rdflib==7.0.0
 selenium==4.14.0
 unstructured==0.10.25
+tiktoken==0.5.1
