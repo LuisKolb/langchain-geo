@@ -42,8 +42,20 @@ you can also modify the port the container will be exposed on.
 
 ### the whole package as a docker thingy
 
+#### pull from dockerhub
+
 ```bash
-docker run --network lc-geo-net --name chromadb chromadb/chroma:latest
-docker build . -t lc-geo-api
-docker run --network lc-geo-net --name agent -p 8001 lc-geo-api
+docker pull luiskolb/geo-agent:latest
 ```
+
+#### build this image
+
+you can pull from dockerhub (coming soon...), or build your own images (will have to modify `docker-compose.yaml`):
+
+```bash
+docker build . -t luiskolb/geo-agent:latest
+```
+
+and then run the `docker-compose up` command
+
+on windows, docker volumes (like the ones created using docker-compose) are usually found at `\\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\<volume name>\_data`
