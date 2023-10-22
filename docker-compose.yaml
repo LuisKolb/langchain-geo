@@ -8,6 +8,8 @@ services:
     depends_on:
       chromadb:
         condition: service_healthy
+    env_file:
+      - .env
   
   chromadb:
     image: chromadb/chroma:latest
@@ -21,6 +23,8 @@ services:
       timeout: 30s
       retries: 3
       start_period: 30s
+    env_file:
+      - .env
 
 volumes:
   db-data:

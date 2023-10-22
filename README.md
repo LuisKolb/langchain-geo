@@ -42,33 +42,28 @@ you can also modify the port the container will be exposed on.
 
 ### the whole package as a docker thingy
 
+for a minimal setup, **in the same directory**:
+
 1. download docker-compose.yaml
-2. ensure the file `src/.env` exists and has a valid OpenAI API key as specified in `src/.env-example`
+2. ensure the file `.env` exists and has a valid OpenAI API key as specified in `.env-example`
 3. run this command: 
 
 ```bash
 docker-compose up
 ```
 
-on windows, docker volumes (like the ones created using docker-compose) are usually found at 
+on windows, docker volumes (like the ones created using docker-compose) are usually found at:
+
 ```
 \\wsl.localhost\docker-desktop-data\version-pack-data\community\docker\volumes\<volume name>\_data
 ```
 
-### obtaining the image
+#### obtaining the image locally
 
-there are two options:
-
-#### pull from dockerhub
-
-```bash
-docker pull luiskolb/geo-agent:latest
-```
-
-#### build this image
-
-you can pull from dockerhub, or build your own image (will have to modify `docker-compose.yaml`):
+you can build your own image from this repo:
 
 ```bash
 docker build . -t luiskolb/geo-agent:latest
 ```
+
+to use it, you'll have to manually set up the chromadb/chroma image in addition (environment variables, volumes, ports will have to be provided manually, for example through the docker desktop interface seen in the image above)

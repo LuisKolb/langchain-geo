@@ -1,3 +1,7 @@
-.vscode
+.vscode/
+venv/
+__pycache__/
+
 src/data/rdf/*.rdf
-venv
+
+.env
