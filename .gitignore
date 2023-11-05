@@ -162,6 +162,6 @@ cython_debug/
 # jupyter experiment notebooks
 # *.ipynb
 
-# don't keep local rdf files used only for testing
-src/data/rdf/*.*
-!src/data/rdf/.gitkeep
+# don't keep local data files used only for testing
+src/data/rdf/*.rdf
+src/data/*.tsv
