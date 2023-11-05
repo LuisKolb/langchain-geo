@@ -165,3 +165,4 @@ cython_debug/
 # don't keep local data files used only for testing
 src/data/rdf/*.rdf
 src/data/*.tsv
+src/data/*.pkl
