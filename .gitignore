@@ -166,3 +166,4 @@ cython_debug/
 src/data/rdf/*.rdf
 src/data/*.tsv
 src/data/*.pkl
+src/data/*.txt

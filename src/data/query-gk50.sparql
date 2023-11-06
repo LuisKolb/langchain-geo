@@ -1,0 +1,35 @@
+#
+# Full SPARQL query to obtain thesaurus triples from the GK50 repo on https://resource.geosphere.at/graphdb/sparql
+#
+
+PREFIX gk50: <http://gk50.geolba.ac.at/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+select DISTINCT ?id (REPLACE(?text,"_"," ") AS ?TEXT) (GROUP_CONCAT(DISTINCT ?map; separator = ' or ') as ?MAP)
+where {
+    #describing the local occurrences of Geologic Units
+    {?e gk50:mainAge ?a; gk50:eventEnvironment ?ee; gk50:eventProcess ?ep; gk50:isEventOf ?u . 
+    ?u gk50:geolUnit ?id; gk50:geolUnitType ?gt; gk50:mainLithology ?l; gk50:onMap ?map . 
+    ?id skos:prefLabel ?GU . FILTER(lang(?GU)="en") ?l skos:prefLabel ?L . FILTER(lang(?L)="en")
+    ?a skos:prefLabel ?A . FILTER(lang(?A)="en")
+    BIND(CONCAT(STR(?GU), " a ", STRAFTER(STR(?gt), "unittype/"), ", mainly consiting of ", STR(?L)," formed during ", STR(?A), " under ", STRAFTER(STR(?ep), "process/"), " and ", STRAFTER(STR(?ee), "environment/"), ", on map sheet ") as ?text)}
+    
+    UNION #which rock types of which ages on which map sheets
+    {?e gk50:olderAge ?oa; gk50:youngerAge ?ya; gk50:isEventOf ?u . FILTER(?oa!=?ya)
+    ?u gk50:mainLithology ?id; gk50:onMap ?map . ?id skos:prefLabel ?L . FILTER(lang(?L)="en")
+    ?oa skos:prefLabel ?OA . FILTER(lang(?OA)="en") ?ya skos:prefLabel ?YA . FILTER(lang(?YA)="en")
+    BIND(CONCAT(STR(?L), ", a rock type formed between ", STR(?OA), " and ", STR(?YA), ", on map sheet ") as ?text)}
+    
+    UNION #which tectonic units includes which geologic units on which map sheets
+    {?u gk50:geolUnit ?gu; gk50:tectUnit ?id; gk50:onMap ?map . 
+    ?gu skos:prefLabel ?GU . FILTER(lang(?GU)="en") 
+    ?id skos:prefLabel ?TU . FILTER(lang(?TU)="en")
+    BIND(CONCAT(STR(?TU), " includes ", STR(?GU), ", on map sheet ") as ?text)}
+    
+    UNION #describe geologic events on different map sheets
+    {VALUES ?age {gk50:mainAge gk50:olderAge gk50:youngerAge}
+    ?e ?age ?a; gk50:eventEnvironment ?ee; gk50:eventProcess ?id; gk50:isEventOf ?u .
+    ?u gk50:onMap ?map . ?a skos:prefLabel ?A . FILTER(lang(?A)="en")
+    BIND(CONCAT(STRAFTER(STR(?id), "process/"), " in ", STRAFTER(STR(?ee), "environment/"),  " from ", STR(?A), ", on map sheet ") as ?text)}
+    
+}
+GROUP BY ?id ?text

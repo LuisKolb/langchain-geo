@@ -1,0 +1,61 @@
+# Full
+# SPARQL query to obtain thesaurus triples from the GK50 repo on https://resource.geosphere.at/graphdb/sparql
+#
+
+PREFIX dcterms:<http://purl.org/dc/terms/>
+PREFIX skos:<http://www.w3.org/2004/02/skos/core#>
+PREFIX foaf:<http://xmlns.com/foaf/0.1/>
+PREFIX dbpo:<http://dbpedia.org/ontology/>
+
+SELECT DISTINCT ?s ?S ?P (GROUP_CONCAT(DISTINCT(?O); separator = "|") as ?values)
+
+WHERE {
+VALUES ?label {skos:prefLabel skos:altLabel} #naming concepts
+VALUES ?attrRel {skos:definition skos:scopeNote skos:notation skos:example dcterms:description dcterms:bibliographicCitation dbpo:colourHexCode} #concept to text
+VALUES ?semRel {skos:broader skos:narrower skos:related dcterms:references} #concept to concept
+VALUES ?link {skos:exactMatch skos:closeMatch skos:relatedMatch foaf:depiction dcterms:source } #concept to url
+
+#each {union part} could be done separately if it takes too long 
+{?s skos:altLabel ?O; skos:prefLabel ?S . BIND(skos:altLabel AS ?p)} #not applicable for ref Thesaurus
+UNION
+{?s ?attrRel ?O; ?label ?S . BIND(?attrRel AS ?p)}
+UNION
+{?s ?semRel ?o; ?label ?S . ?o ?label ?O . BIND(?semRel AS ?p)} #not applicable for ref Thesaurus
+UNION
+{?s ?link ?o; ?label ?S . BIND(?link AS ?p) BIND(STR(?o) AS ?O)}
+
+FILTER (lang(?S) != "de") FILTER (lang(?O) != "de") #restrict to English terms
+
+BIND(
+  COALESCE( #replace predicates for..
+    #alternative names
+    IF(?p = skos:altLabel, "also known as", 1/0), 
+
+    #attribute relations
+    IF(?p = skos:definition, "is described with ", 1/0),
+    IF(?p = skos:scopeNote, "has the following notes ", 1/0),
+    IF(?p = skos:notation, "is in database coded with ", 1/0),
+    IF(?p = dcterms:bibliographicCitation, "has bibliographic citation ", 1/0),
+    IF(?p = skos:example, "can be located at ", 1/0),  
+    IF(?p = dcterms:description, "is further described as ", 1/0),
+    IF(?p = dbpo:colourHexCode, "is displayed on maps with webcolor ", 1/0),
+
+    #semantic relations
+    IF(?p = skos:broader, "is part of ", 1/0),
+    IF(?p = skos:narrower, "includes ", 1/0),
+    IF(?p = skos:related, "is related to ", 1/0),
+    IF(?p = dcterms:references, "has a bibliographic reference: ", 1/0),
+
+    #external links
+    IF(?p = skos:exactMatch, "see also ", 1/0),
+    IF(?p = skos:closeMatch, "see also ", 1/0),
+    IF(?p = skos:relatedMatch, "see also ", 1/0),
+    IF(?p = foaf:depiction, "is shown under the following link ", 1/0),
+    IF(?p = dcterms:source, "is derived from ", 1/0),
+
+    STR(?p)
+  ) AS ?P
+)
+
+}
+GROUP BY ?s ?S ?P
