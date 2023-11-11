@@ -29,7 +29,7 @@ FILTER (lang(?S) != "de") FILTER (lang(?O) != "de") #restrict to English terms
 BIND(
   COALESCE( #replace predicates for..
     #alternative names
-    IF(?p = skos:altLabel, "also known as", 1/0), 
+    IF(?p = skos:altLabel, "also known as ", 1/0), 
 
     #attribute relations
     IF(?p = skos:definition, "is described with ", 1/0),
