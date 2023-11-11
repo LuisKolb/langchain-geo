@@ -19,7 +19,7 @@ services:
       - db-data:/chroma/chroma
     healthcheck:
       test: python -c "import requests;requests.get('http://localhost:8000')"
-      interval: 30s
+      interval: 60s
       timeout: 30s
       retries: 3
       start_period: 30s
