@@ -168,4 +168,4 @@ src/data/*.tsv
 src/data/*.pkl
 src/data/*.txt
 
-src/outfile.txt
+src/*.txt
