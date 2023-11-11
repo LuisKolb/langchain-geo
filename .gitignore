@@ -167,3 +167,5 @@ src/data/rdf/*.rdf
 src/data/*.tsv
 src/data/*.pkl
 src/data/*.txt
+
+src/outfile.txt

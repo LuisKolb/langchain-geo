@@ -13,7 +13,7 @@ from langchain.agents import AgentExecutor
 # CONFIG
 #
 
-collection_name = "geo_test"    # collection name in chromaDB
+collection_name = "geo_demo"    # collection name in chromaDB
 hostname = "chromadb"           # this is the hostname configured in docker-compose.yaml
 port = "8000"                   # this is the port configured in docker-compose.yaml
 temperature = 0                 # openAI LLM temp
@@ -31,7 +31,8 @@ lc_client = Chroma(client=chroma_client,
 
 
 from langchain.chat_models import ChatOpenAI
-llm = ChatOpenAI(temperature=temperature)
+# see https://platform.openai.com/docs/models/gpt-3-5 for model selection
+llm = ChatOpenAI(temperature=temperature, model='gpt-3.5-turbo')
 
 
 # This is needed for both the memory and the prompt
