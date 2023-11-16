@@ -73,3 +73,5 @@ chain = AgentExecutor(agent=agent,
                       memory=memory,
                       verbose=True,
                       return_intermediate_steps=True)
+
+# TODO add debug mode for cost & runtime logging to evaluate for report
