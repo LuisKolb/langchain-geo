@@ -1,4 +1,5 @@
 from dotenv import load_dotenv
+import os
 import chromadb
 from langchain.vectorstores import Chroma
 from langchain.embeddings import OpenAIEmbeddings
@@ -8,6 +9,7 @@ from langchain.agents.openai_functions_agent.base import OpenAIFunctionsAgent
 from langchain.prompts import MessagesPlaceholder
 from langchain.agents.agent_toolkits import create_retriever_tool
 from langchain.agents import AgentExecutor
+from langchain.chat_models import ChatOpenAI
 
 #
 # CONFIG
@@ -17,6 +19,8 @@ collection_name = "geo_demo"    # collection name in chromaDB
 hostname = "chromadb"           # this is the hostname configured in docker-compose.yaml
 port = "8000"                   # this is the port configured in docker-compose.yaml
 temperature = 0                 # openAI LLM temp
+model = 'gpt-3.5-turbo'         # see https://platform.openai.com/docs/models/gpt-3-5 for model selection
+verbose_mode = False
 
 #
 # SETUP
@@ -24,22 +28,35 @@ temperature = 0                 # openAI LLM temp
 
 load_dotenv()
 
+def is_docker():
+    path = "/proc/self/cgroup"
+    return (
+        os.path.exists("/.dockerenv")
+        or os.path.isfile(path)
+        and any("docker" in line for line in open(path))
+    )
+
+if not is_docker():
+    hostname = "localhost"
+    verbose_mode = True 
+
+# client
 chroma_client = chromadb.HttpClient(host=hostname, port=port)
 lc_client = Chroma(client=chroma_client,
                    collection_name=collection_name,
                    embedding_function=OpenAIEmbeddings())
 
-
-from langchain.chat_models import ChatOpenAI
-# see https://platform.openai.com/docs/models/gpt-3-5 for model selection
-llm = ChatOpenAI(temperature=temperature, model='gpt-3.5-turbo')
+# LLM
+llm = ChatOpenAI(temperature=temperature, model=model, streaming=False)
+llm_stream = ChatOpenAI(temperature=temperature, model=model, streaming=True)
 
 
 # This is needed for both the memory and the prompt
 memory_key = "history"
 memory = AgentTokenBufferMemory(memory_key=memory_key, llm=llm)
+memory_stream = AgentTokenBufferMemory(memory_key=memory_key, llm=llm_stream)
 
-
+# prompt setup
 system_message = SystemMessage(
         content=(
             "Do your best to answer the questions. "
@@ -52,6 +69,7 @@ prompt = OpenAIFunctionsAgent.create_prompt(
         extra_prompt_messages=[MessagesPlaceholder(variable_name=memory_key)])
 
 
+# retriever
 retriever = lc_client.as_retriever(search_kwargs={"k": 2})
 tool = create_retriever_tool(
     retriever, 
@@ -61,17 +79,25 @@ tool = create_retriever_tool(
 tools = [tool]
 
 
+# agent
 agent = OpenAIFunctionsAgent(llm=llm,
                              tools=tools,
                              prompt=prompt)
 
+agent_stream = OpenAIFunctionsAgent(llm=llm_stream,
+                                    tools=tools,
+                                    prompt=prompt)
 
-# TODO: fix the below behaviour - is this still relevant with langserve?
-# return_intermediate_steps is True because langcorn uses `chain.output_keys > 1` to identify the return data model...
+# runnable chain
+# return_intermediate_steps needs to be True! otherwise a keyError happens in `agent_token_buffer_memory.py`
 chain = AgentExecutor(agent=agent,
                       tools=tools, 
                       memory=memory,
-                      verbose=True,
+                      verbose=verbose_mode,
                       return_intermediate_steps=True)
 
-# TODO add debug mode for cost & runtime logging to evaluate for report
+chain_stream = AgentExecutor(agent=agent_stream,
+                             tools=tools, 
+                             memory=memory_stream,
+                             verbose=verbose_mode,
+                             return_intermediate_steps=True)

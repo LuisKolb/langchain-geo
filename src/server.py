@@ -9,7 +9,8 @@ from langserve import add_routes
 logger = logging.getLogger(__name__)
 
 try:
-    from chains.convqa import chain
+    from chains.convqa import chain as convqa
+    from chains.convqa import chain_stream as convqa_stream
 except ConnectionError:
     logger.error('[ERROR] ChromaDB Docker container is not running or not reachable! exiting...')
     sys.exit(1)
@@ -25,7 +26,8 @@ app.add_middleware(
     allow_headers=['*'],
 )
 
-add_routes(app, chain)
+add_routes(app, convqa, path="/convqa")
+add_routes(app, convqa_stream, path="/convqa_stream")
 
 # run the server simply by executing this python file
 #
@@ -33,5 +35,19 @@ add_routes(app, chain)
 
 if __name__ == "__main__":
     import uvicorn
+    import os
 
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    def is_docker():
+        path = "/proc/self/cgroup"
+        return (
+            os.path.exists("/.dockerenv")
+            or os.path.isfile(path)
+            and any("docker" in line for line in open(path))
+        )
+
+    if is_docker():
+        host = "0.0.0.0"
+    else:
+        host = "localhost"
+
+    uvicorn.run(app, host=host, port=8001)
